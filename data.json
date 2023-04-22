@@ -1,0 +1,42 @@
+[
+  {
+    "word1": "chat",
+    "word2": "chien"
+  },
+  {
+    "word1": "pomme",
+    "word2": "poire"
+  },
+  {
+    "word1": "voiture",
+    "word2": "moto"
+  },
+  {
+    "word1": "avion",
+    "word2": "hélicoptère"
+  },
+  {
+    "word1": "chaise",
+    "word2": "tabouret"
+  },
+  {
+    "word1": "soleil",
+    "word2": "lune"
+  },
+  {
+    "word1": "été",
+    "word2": "hiver"
+  },
+  {
+    "word1": "montagne",
+    "word2": "plaine"
+  },
+  {
+    "word1": "ville",
+    "word2": "campagne"
+  },
+  {
+    "word1": "ordinateur",
+    "word2": "smartphone"
+  }
+]

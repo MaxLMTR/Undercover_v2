@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Undercover / Mr. White</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+</head>
+
+<body>
+  <div id="game-container">
+    <h1>Undercover / Mr. White</h1>
+    <div id="lobby">
+      <label for="playerName">Nom du joueur :</label>
+      <input type="text" id="playerName" placeholder="Entrez votre nom">
+      <button id="createRoom">Créer une salle</button>
+      <button id="joinRoom">Rejoindre une salle</button>
+      <input type="text" id="roomCode" placeholder="Code de la salle">
+    </div>
+    <div id="room" style="display: none;">
+      <p id="room-info">Salle : <span id="room-id"></span></p>
+      <div id="player-list">
+        <h3>Joueurs :</h3>
+        <ul id="players"></ul>
+      </div>
+      <button id="startGame" disabled>Démarrer le jeu</button>
+      <p>Seul l'hôte peut démarrer le jeu</p>
+    </div>
+    <div id="game" style="display: none;">
+      <div id="word-container">
+        <p>Votre mot : <span id="player-word"></span></p>
+      </div>
+      <div id="game-phase">
+        <h3>Phase de Description</h3>
+        <input type="text" id="description" placeholder="Décrivez votre mot">
+        <button id="submitDescription">Soumettre</button>
+        <ul id="descriptions"></ul>
+      </div>
+      <div id="game-phase">
+        <h3>Phase de Discussion</h3>
+        <ul id="discussion"></ul>
+        <input style="display: none;" type="text" id="discussionin" placeholder="Discutez">
+        <button style="display: none;" id="submitDiscussion">Envoyer</button>
+      </div>
+      <div id="game-phase">
+        <h3>Phase d’Élimination</h3>
+        <ul id="elimination"></ul>
+        <button id="submitVote">Voter</button>
+      </div>
+      <div id="game-results" style="display: none;">
+        <h3>Résultats du jeu</h3>
+        <p id="result-message"></p>
+      </div>
+    </div>
+  </div>
+  <script src="client.js"></script>
+</body>
+
+</html>
