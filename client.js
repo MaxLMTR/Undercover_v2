@@ -16,18 +16,21 @@ const descriptionInput = document.getElementById('description');
 const submitDescriptionBtn = document.getElementById('submitDescription');
 const descriptionsList = document.getElementById('descriptions');
 const discussionList = document.getElementById('discussion');
-const eliminationList = document.getElementById('elimination');
+const eliminationList = document.getElementById('votelist');
 const submitVoteBtn = document.getElementById('submitVote');
 const gameResults = document.getElementById('game-results');
 const resultMessage = document.getElementById('result-message');
 const discussionInput = document.getElementById('discussionin');
 const submitDiscussionBtn = document.getElementById('submitDiscussion');
+const game_vote = document.getElementById('game-vote');
+const game_vote_result = document.getElementById('game-result-vote');
+const result_message = document.getElementById('result-message');
 
 // Variables globales
 let playerId = null;
 let currentPhase = null;
 
-// Gestion des événements
+//créer une salle
 createRoomBtn.addEventListener('click', () => {
   const playerName = playerNameInput.value.trim();
   if (playerName) {
@@ -37,6 +40,7 @@ createRoomBtn.addEventListener('click', () => {
   }
 });
 
+//rejoindre une salle
 joinRoomBtn.addEventListener('click', () => {
   const playerName = playerNameInput.value.trim();
   const roomCode = roomCodeInput.value.trim();
@@ -50,11 +54,13 @@ joinRoomBtn.addEventListener('click', () => {
   }
 });
 
+//commencer le jeu
 startGameBtn.addEventListener('click', () => {
   socket.emit('startGame');
   console.log("Bouton start game appuyé");
 });
 
+//envoyer son mot
 submitDescriptionBtn.addEventListener('click', () => {
   const description = descriptionInput.value.trim();
   if (description) {
@@ -65,6 +71,7 @@ submitDescriptionBtn.addEventListener('click', () => {
   }
 });
 
+//discuter
 submitDiscussionBtn.addEventListener('click', () => {
   const discussion = discussionInput.value;
   if (discussion) {
@@ -75,23 +82,27 @@ submitDiscussionBtn.addEventListener('click', () => {
   }
 });
 
-submitVoteBtn.addEventListener('click', () => {
-  const selectedPlayer = document.querySelector('#elimination li.selected');
-  if (selectedPlayer) {
-    const targetPlayerId = selectedPlayer.getAttribute('data-player-id');
-    socket.emit('submitVote', targetPlayerId);
-  } else {
-    alert('Veuillez sélectionner un joueur à éliminer.');
-  }
+//voter
+submitVoteBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  const toEliminatePlayer = document.getElementById("votelist").value;
+  console.log(toEliminatePlayer);
+  console.log(playerId);
+  socket.emit("submitVote", { toEliminatePlayer, playerId });
+  game_vote.style.display = 'none';
+  game_vote_result.style.display = 'inline-block';
 });
 
-// Gestion des événements du serveur
 socket.on('playerInfo', (playerInfo) => {
   playerId = playerInfo.id;
 });
 
 socket.on('roomCreated', (roomInfo) => {
   showRoom(roomInfo);
+});
+
+socket.on('updatePlayers', (players) => {
+  updatePlayersList(players);
 });
 
 socket.on('roomJoined', (roomInfo) => {
@@ -106,10 +117,6 @@ socket.on('NotenoughToStart', () => {
   startGameBtn.disabled = true;
 });
 
-socket.on('updatePlayers', (players) => {
-  updatePlayersList(players);
-});
-
 socket.on('gameStarted', (gameData) => {
   currentPhase = 'description';
   lobby.style.display = 'none';
@@ -122,35 +129,46 @@ socket.on('updateDescriptions', (updateData) => {
   updateDescriptionsList(updateData);
 });
 
-socket.on('startDiscussion', (data) => {
-  // Mettez à jour l'interface utilisateur pour afficher les descriptions et démarrer la phase de discussion
-  // Par exemple, vous pouvez afficher les descriptions dans un élément de liste
-  descriptionInput.style.display = 'none';
-  submitDescriptionBtn.style.display = 'none';
-  discussionInput.style.display = 'inline-block';
-  submitDiscussionBtn.style.display = 'inline-block';
-  // Affichez un compte à rebours pour la phase de discussion
-  // ...
-});
-
 socket.on('updateDiscussion', (updateData) => {
   updateDiscussionList(updateData);
 });
 
-socket.on('endDiscussion', (data) => {
-  // Mettez à jour l'interface utilisateur pour terminer la phase de discussion et passer à la phase de vote
-  // Par exemple, vous pouvez masquer l'élément de liste des descriptions et afficher un formulaire de vote
-  // ...
-});
-socket.on('updateElimination', (elimination) => {
-  updateEliminationList(elimination);
+socket.on('startVotePhase', (data) => {
+  startVote(data);
 });
 
-socket.on('gameResult', (result) => {
-  displayGameResult(result);
+socket.on('awaitForResults', () => {
+  game_vote_result.style.display = 'inline-block';
+  result_message.innerText = 'Attente des résultats de vote';
 });
 
-// Fonctions utilitaires
+socket.on('Screen_for_mr_white', (data) => {
+  //
+});
+
+socket.on('eliminated_mr_white', (data) => {
+  game_vote_result.style.display = 'inline-block';
+  result_message.innerText = `${data.playerName} a été éliminé(e), c'était ${data.votedAgainst.role}, il va devoir deviner son mot`
+});
+
+socket.on('civils_winner', (data) => {
+  game_vote_result.style.display = 'inline-block';
+  result_message.innerText = result_message.innerText = `${data.playerName} a été éliminé(e), c'était un ${data.votedAgainst.role}, les civils ont gagné !`
+});
+
+socket.on('undercoversWinner', (data) => {
+  result_message.innerText = `${data.playerName} a été éliminé(e), c'était un ${data.votedAgainst.role}, les imposteurs ont gagné !`
+});
+
+socket.on('eliminated_simple', (data) => {
+  result_message.innerText = `${data.playerName} a été éliminé(e), c'était un ${data.votedAgainst.role}`
+});
+
+socket.on('disable_button', () => {
+  submitDescriptionBtn.disabled = true;
+});
+
+
 function showRoom(roomInfo) {
   lobby.style.display = 'none';
   room.style.display = 'block';
@@ -182,33 +200,16 @@ function updateDiscussionList(updateData) {
   
 }
 
-function updateEliminationList(elimination) {
+function startVote(data) {
+  game_vote.style.display = 'inline-block';
+  console.log("#########################################");
+  console.log(data);
   eliminationList.innerHTML = '';
-  elimination.forEach((player) => {
-    if (player.id !== playerId) {
-      const li = document.createElement('li');
-      li.textContent = player.name;
-      li.setAttribute('data-player-id', player.id);
-      li.addEventListener('click', () => {
-        const selectedPlayer = document.querySelector('#elimination li.selected');
-        if (selectedPlayer) {
-          selectedPlayer.classList.remove('selected');
-        }
-        li.classList.add('selected');
-      });
-      eliminationList.appendChild(li);
-    }
+  const players_not_eliminated = data.players.filter((player) => !player.eliminated);
+  players_not_eliminated.forEach((player) => {
+    const option = document.createElement("option");
+    option.value = player.id;
+    option.textContent = `${player.name}`;
+    eliminationList.appendChild(option);
   });
-}
-
-function displayGameResult(result) {
-  game.style.display = 'none';
-  gameResults.style.display = 'block';
-  if (result === 'civils') {
-    resultMessage.textContent = 'Les Civils ont gagné !';
-  } else if (result === 'impostors') {
-    resultMessage.textContent = 'Les Imposteurs ont gagné !';
-  } else if (result === 'mrWhite') {
-    resultMessage.textContent = 'Mr.White a gagné !';
-  }
 }
