@@ -1,5 +1,5 @@
 body {
-  font-family: 'Courier New', Courier, monospace, sans-serif;
+  font-family: "Courier New", Courier, monospace, sans-serif;
   background-color: #292d3e;
   color: #bfc7d5;
   margin: 0;
@@ -45,12 +45,15 @@ select {
   justify-content: space-between;
 }
 
-#game-phase,#game-joueur,#game-vote,#game-result-vote {
+#game-phase,
+#game-joueur,
+#game-vote,
+#game-result-vote {
   flex: 1;
   min-width: 250px;
   max-width: 100%;
   padding: 1rem;
-  box-sizing:content-box;
+  box-sizing: content-box;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -59,7 +62,7 @@ p {
   font-size: 1.5rem;
 }
 
-.rules{
+.rules {
   font-size: 1rem;
   font-weight: bold;
 }
@@ -67,11 +70,12 @@ p {
 h1 {
   text-align: center;
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 900;
   margin-bottom: 5px;
   margin-top: 0px;
   color: #ab47bc;
 }
+
 label {
   font-size: 1.2rem;
 }
@@ -141,7 +145,8 @@ button:disabled {
   margin-bottom: 5px;
 }
 
-#game-phase,#game-joueur{
+#game-phase,
+#game-joueur {
   margin-bottom: 20px;
 }
 
@@ -168,14 +173,12 @@ button:disabled {
   text-align: center;
 }
 
-
 /* Ajout de styles supplémentaires pour améliorer l'expérience utilisateur */
 #lobby,
 #room,
 #game {
   margin-bottom: 20px;
 }
-
 
 #room-info {
   font-weight: bold;
@@ -189,7 +192,7 @@ button:disabled {
 
 #elimine {
   font-weight: bold;
-  color:#ab47bc
+  color: #ab47bc;
 }
 
 #submitDescription,
