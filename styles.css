@@ -187,6 +187,11 @@ button:disabled {
   font-weight: bold;
 }
 
+#elimine {
+  font-weight: bold;
+  color:#ab47bc
+}
+
 #submitDescription,
 #submitDiscussion,
 #submitVote {

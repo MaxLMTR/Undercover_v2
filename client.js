@@ -31,6 +31,7 @@ const timer_p = document.getElementById('timer');
 const alive_players_p = document.getElementById('alive_players');
 const players_list = document.getElementById('players_list');
 const currentPlayerNameElement = document.getElementById('current-player');
+const elimine_span = document.getElementById('elimine');
 //mr_white
 const for_mr_white = document.getElementById('mr_white_container');
 const mrWhiteInput = document.getElementById('mrWhiteInput');
@@ -39,6 +40,7 @@ const submitMrWhiteBtn = document.getElementById('submitMrWhite');
 // Variables globales
 let playerId = null;
 let currentPhase = null;
+let elimine = false;
 
 //créer une salle
 createRoomBtn.addEventListener('click', () => {
@@ -188,7 +190,11 @@ socket.on('undercoversWinner', (data) => {
 
 socket.on('eliminated_simple', (data) => {
   gameUpdate(data.game)
-  submitDescriptionBtn.disabled = false;
+  if(elimine == false){
+    submitDescriptionBtn.style.display = 'inline-block';
+    descriptionInput.style.display = 'inline-block';
+    phase_vote.style.display = 'none';
+  }
   currentPlayerNameElement.style.display = 'inline-block';
   result_message.innerText = `${data.playerName} a été éliminé(e), c'était un ${data.votedAgainst.role}`
   timer()
@@ -215,9 +221,7 @@ function timer(){
     if (timeRemaining <= 0) {
       clearInterval(countdown);
       timer_p.style.display = 'none';
-      if(!submitVoteBtn.disabled){
-        phase_resultats.style.display = 'none';
-      }
+      phase_resultats.style.display = 'none';
       phase_description.style.display = 'inline-block';
     }
   }, 1000);
@@ -227,13 +231,13 @@ socket.on('disable_button', () => {
   submitDescriptionBtn.disabled = true;
 });
 
-socket.on('disable_vote', () => {
+socket.on('eliminate', () => {
+  elimine = true;
+  elimine_span.textContent = " Vous avez été éliminé"
   descriptionInput.style.display ='none'
-  descriptionInput.disabled = true;
-  submitVoteBtn.disabled.style.display ='none'
-  submitVoteBtn.disabled = true;
   submitDescriptionBtn.style.display ='none'
-  submitDescriptionBtn.disabled = true;
+  submitVoteBtn.style.display ='none'
+  eliminationList.style.display ='none'
 });
 
 socket.on('mrWhiteWinner', (updateData) => {
@@ -242,7 +246,11 @@ socket.on('mrWhiteWinner', (updateData) => {
 });
 
 socket.on('mrWhiteNoWinner', (updateData) => {
-  submitDescriptionBtn.disabled = false;
+  if(elimine == false){
+    submitDescriptionBtn.style.display = 'inline-block';
+    descriptionInput.style.display = 'inline-block';
+    phase_vote.style.display = 'none';
+  }
   currentPlayerNameElement.style.display = 'inline-block';
   result_message.innerText = `Mr White - ${updateData.name} n'a pas deviné le mot, la partie continue !`
   timer()
@@ -286,13 +294,17 @@ function updateDiscussionList(updateData) {
 
 function startVote(data) {
   currentPlayerNameElement.style.display = 'none';
-  submitDescriptionBtn.disabled = true;
-  if(!submitVoteBtn.disabled){
+  
+  if(elimine == false){
+    submitDescriptionBtn.style.display = 'none';
+    descriptionInput.style.display = 'none';
     phase_vote.style.display = 'inline-block';
   }
   else{
-    result_message.innerText = 'Attente des résultats de vote';
+    phase_vote.style.display = 'none';
     phase_description.style.display = 'none';
+    result_message.innerText = 'Attente des résultats de vote';
+    phase_resultats.style.display = 'inline-block';
   }
   eliminationList.innerHTML = '';
   const players_not_eliminated = data.players.filter((player) => !player.eliminated);

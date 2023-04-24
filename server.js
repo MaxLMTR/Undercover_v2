@@ -125,27 +125,37 @@ io.on('connection', (socket) => {
     console.log(updateData.state);
     if (updateData) {
       io.to(playerId).emit('awaitForResults');
+
+      if (updateData.state === 'eliminated_mr_white') {
+        const nextPlayer = nextTurn(updateData.game);
+        io.to(updateData.game.id).emit('nextPlayer', {
+          nextPlayerId: nextPlayer.id,
+          nextPlayerName: nextPlayer.name,
+        });
+        io.to(updateData.playerId).emit('disable_button');
+        io.to(updateData.playerId).emit('Screen_for_mr_white', updateData);
+        io.to(updateData.playerId).emit('eliminate');
+        io.to(updateData.game.id).emit('eliminatedMrWhite', updateData);
+      }
+      else if (updateData.state === 'civils_winner') {
+        io.to(updateData.game.id).emit('civilsWinner', updateData);
+        io.to(updateData.game.id).emit('disable_button');
+      }
+      else if (updateData.state === 'undercovers_winner') {
+        io.to(updateData.game.id).emit('undercoversWinner', updateData);
+        io.to(updateData.game.id).emit('disable_button');
+      }
+      else if (updateData.state === 'eliminated_simple') {
+        const nextPlayer = nextTurn(updateData.game);
+        io.to(updateData.game.id).emit('nextPlayer', {
+          nextPlayerId: nextPlayer.id,
+          nextPlayerName: nextPlayer.name,
+        });
+        io.to(updateData.playerId).emit('disable_button');
+        io.to(updateData.playerId).emit('eliminate');
+        io.to(updateData.game.id).emit('eliminated_simple', updateData);
+      }
     }
-    if (updateData.state === 'eliminated_mr_white') {
-      io.to(updateData.game.id).emit('eliminatedMrWhite', updateData);
-      io.to(updateData.playerId).emit('disable_button');
-      io.to(updateData.playerId).emit('Screen_for_mr_white', updateData);
-      io.to(updateData.playerId).emit('disable_vote');
-    }
-    if (updateData.state === 'civils_winner') {
-      io.to(updateData.game.id).emit('civilsWinner', updateData);
-      io.to(updateData.game.id).emit('disable_button');
-    }
-    if (updateData.state === 'undercovers_winner') {
-      io.to(updateData.game.id).emit('undercoversWinner', updateData);
-      io.to(updateData.game.id).emit('disable_button');
-    }
-    if (updateData.state === 'eliminated_simple') {
-      io.to(updateData.game.id).emit('eliminated_simple', updateData);
-      io.to(updateData.playerId).emit('disable_button');
-      io.to(updateData.playerId).emit('disable_vote');
-    }
-    //
   });
 
   // verifier mot mr white
