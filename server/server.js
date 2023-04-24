@@ -21,18 +21,15 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-app.use(express.static(path.join(__dirname, '/')));
+app.use(express.static(path.join(__dirname, '../public')));
 
-app.get('/', (req, res) => { res.sendFile('index.html'); });
+app.get('/', (req, res) => { res.sendFile('/index.html'); });
 
 const connection = mysql.createConnection({
-  host: "undercover.mysql.database.azure.com",
-  user: "undercover",
-  password: "BestGame.123",
+  host: "localhost",
+  user: "root",
+  password: "",
   database: "undercover",
-  port: 3306,
-  ssl: { ca: fs.readFileSync('DigiCertGlobalRootG2.crt.pem')
-  }
 });
 
 connection.connect();
@@ -46,6 +43,7 @@ app.get('/random-word', (req, res) => {
       res.status(500).json({ error: 'Erreur lors de la récupération du mot aléatoire.' });
     } else {
       res.json(results[0]);
+      console.log(res.json(results[0]));
     }
   });
 });
@@ -180,6 +178,6 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Serveur à l'écoute sur le port ${PORT}`);
 });

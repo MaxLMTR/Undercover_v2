@@ -1,5 +1,4 @@
 NODE_TLS_REJECT_UNAUTHORIZED='0'
-const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
 const games = new Map();
@@ -15,7 +14,7 @@ async function initializeFetch() {
 async function getRandomWordPair() {
   await initializeFetch();
   try {
-    const response = await fetch('http://20.119.16.34:3000/random-word');
+    const response = await fetch('http://localhost/random-word');
     const wordPair = await response.json();
     return wordPair;
   } catch (error) {
