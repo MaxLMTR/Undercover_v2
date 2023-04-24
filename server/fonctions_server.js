@@ -14,7 +14,7 @@ async function initializeFetch() {
 async function getRandomWordPair() {
   await initializeFetch();
   try {
-    const response = await fetch('http://localhost/random-word');
+    const response = await fetch('http://localhost:3000/random-word');
     const wordPair = await response.json();
     return wordPair;
   } catch (error) {

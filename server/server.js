@@ -3,7 +3,7 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
-const mysql = require('mysql2');
+const mysql = require('mysql');
 const fs = require('fs');
 const {
   createGame,
@@ -43,7 +43,6 @@ app.get('/random-word', (req, res) => {
       res.status(500).json({ error: 'Erreur lors de la récupération du mot aléatoire.' });
     } else {
       res.json(results[0]);
-      console.log(res.json(results[0]));
     }
   });
 });
