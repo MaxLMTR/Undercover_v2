@@ -1,44 +1,20 @@
 const socket = io();
 
 // Elements du DOM
-const playerNameInput = document.getElementById("playerName");
-const createRoomBtn = document.getElementById("createRoom");
-const joinRoomBtn = document.getElementById("joinRoom");
-const roomCodeInput = document.getElementById("roomCode");
-const lobby = document.getElementById("lobby");
-const room = document.getElementById("room");
-const roomId = document.getElementById("room-id");
-const playersList = document.getElementById("players");
-const startGameBtn = document.getElementById("startGame");
-const game = document.getElementById("game");
-const playerWord = document.getElementById("player-word");
-const descriptionInput = document.getElementById("description");
-const submitDescriptionBtn = document.getElementById("submitDescription");
-const descriptionsList = document.getElementById("descriptions");
-const discussionList = document.getElementById("discussion");
-const eliminationList = document.getElementById("votelist");
-const submitVoteBtn = document.getElementById("submitVote");
-const gameResults = document.getElementById("game-results");
-const resultMessage = document.getElementById("result-message");
-const discussionInput = document.getElementById("discussionin");
-const submitDiscussionBtn = document.getElementById("submitDiscussion");
-const result_message = document.getElementById("result-message");
-const phase_description = document.getElementById("phase-description");
-const phase_vote = document.getElementById("phase-vote");
-const phase_resultats = document.getElementById("phase-resultats");
-const timer_p = document.getElementById("timer");
-const alive_players_p = document.getElementById("alive_players");
-const players_list = document.getElementById("players_list");
-const currentPlayerNameElement = document.getElementById("current-player");
-const elimine_span = document.getElementById("elimine");
-const for_mr_white = document.getElementById("mr_white_container");
-const mrWhiteInput = document.getElementById("mrWhiteInput");
-const submitMrWhiteBtn = document.getElementById("submitMrWhite");
+const playerNameInput = document.getElementById("playerName"); const createRoomBtn = document.getElementById("createRoom"); const joinRoomBtn = document.getElementById("joinRoom");
+const roomCodeInput = document.getElementById("roomCode"); const lobby = document.getElementById("lobby"); const room = document.getElementById("room"); const roomId = document.getElementById("room-id");
+const playersList = document.getElementById("players"); const startGameBtn = document.getElementById("startGame"); const game = document.getElementById("game");
+const playerWord = document.getElementById("player-word"); const descriptionInput = document.getElementById("description"); const submitDescriptionBtn = document.getElementById("submitDescription");
+const descriptionsList = document.getElementById("descriptions"); const discussionList = document.getElementById("discussion"); const eliminationList = document.getElementById("votelist");
+const submitVoteBtn = document.getElementById("submitVote"); const gameResults = document.getElementById("game-results"); const resultMessage = document.getElementById("result-message");
+const discussionInput = document.getElementById("discussionin"); const submitDiscussionBtn = document.getElementById("submitDiscussion"); const result_message = document.getElementById("result-message");
+const phase_description = document.getElementById("phase-description"); const phase_vote = document.getElementById("phase-vote"); const phase_resultats = document.getElementById("phase-resultats");
+const timer_p = document.getElementById("timer"); const alive_players_p = document.getElementById("alive_players"); const players_list = document.getElementById("players_list");
+const currentPlayerNameElement = document.getElementById("current-player"); const elimine_span = document.getElementById("elimine"); const for_mr_white = document.getElementById("mr_white_container");
+const mrWhiteInput = document.getElementById("mrWhiteInput"); const submitMrWhiteBtn = document.getElementById("submitMrWhite");
 
 // Variables globales
-let playerId = null;
-let currentPhase = null;
-let elimine = false;
+let playerId = null;  let currentPhase = null;  let elimine = false;
 
 //créer une salle
 createRoomBtn.addEventListener("click", () => {

@@ -388,14 +388,4 @@ function nextTurn(game) {
   return nextPlayer;
 }
 
-module.exports = {
-  createGame,
-  joinGame,
-  startGame,
-  submitDescription,
-  submitDiscussion,
-  findGameByPlayerId,
-  submitVote,
-  submitMrWhite,
-  nextTurn,
-};
+module.exports = { createGame, joinGame, startGame, submitDescription, submitDiscussion, findGameByPlayerId, submitVote, submitMrWhite, nextTurn, };
