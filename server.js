@@ -3,6 +3,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
 const mysql = require('mysql');
+const url = require('url');
 const {
   createGame,
   joinGame,
@@ -23,12 +24,15 @@ app.use(express.static(path.join(__dirname, '/')));
 
 app.get('/', (req, res) => { res.sendFile('index.html'); });
 
+const connectionString = process.env.MYSQL_UNDERCOVER; // Remplacez "localdb" par le nom de votre chaîne de connexion si nécessaire.
+const connectionUrl = url.parse(connectionString);
+const auth = connectionUrl.auth.split(':');
 
 const connection = mysql.createConnection({
-  host: 'undercover.mysql.database.azure.com:3306',
-  user: 'undercover',
-  password: 'BestGame.123',
-  database: 'undercover'
+  host: connectionUrl.hostname,
+  user: auth[0],
+  password: auth[1],
+  database: connectionUrl.pathname.substr(1),
 });
 
 connection.connect();
