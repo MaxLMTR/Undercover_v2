@@ -1,4 +1,3 @@
-// AJOUTER SAISIE MOT MR WHITE, SI BON ALORS GAGNE POUR LUI
 const socket = io();
 
 // Elements du DOM
