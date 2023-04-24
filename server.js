@@ -3,7 +3,6 @@ const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
 const mysql = require('mysql');
-const url = require('url');
 const {
   createGame,
   joinGame,
@@ -24,16 +23,12 @@ app.use(express.static(path.join(__dirname, '/')));
 
 app.get('/', (req, res) => { res.sendFile('index.html'); });
 
-const connectionString = process.env.MYSQL_UNDERCOVER; // Remplacez "localdb" par le nom de votre chaîne de connexion si nécessaire.
-const connectionUrl = url.parse(connectionString);
-const auth = connectionUrl.auth.split(':');
-
-
 const connection = mysql.createConnection({
-  host: connectionUrl.hostname,
-  user: auth[0],
-  password: auth[1],
-  database: connectionUrl.pathname.substr(1)
+  host: "undercover.mysql.database.azure.com",
+  user: "undercover",
+  password: "BestGame.123",
+  database: "undercover",
+  port: 3306,
 });
 
 connection.connect();
@@ -181,6 +176,6 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Serveur à l'écoute sur le port ${PORT}`);
 });
