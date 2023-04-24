@@ -1,3 +1,4 @@
+NODE_TLS_REJECT_UNAUTHORIZED='0'
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 

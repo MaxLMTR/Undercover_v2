@@ -1,8 +1,10 @@
+NODE_TLS_REJECT_UNAUTHORIZED='0'
 const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
-const mysql = require('mysql');
+const mysql = require('mysql2');
+const fs = require('fs');
 const {
   createGame,
   joinGame,
@@ -29,6 +31,8 @@ const connection = mysql.createConnection({
   password: "BestGame.123",
   database: "undercover",
   port: 3306,
+  ssl: { ca: fs.readFileSync('DigiCertGlobalRootG2.crt.pem')
+  }
 });
 
 connection.connect();
