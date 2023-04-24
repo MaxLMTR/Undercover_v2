@@ -75,6 +75,11 @@ async function startGame(playerId) {
     game.words = { civil: wordPair.word1, undercover: wordPair.word2, }
     game.phase = 'description';
 
+    const nonWhitePlayer = game.players.find((player) => player.role !== 'mr_white');
+    if (nonWhitePlayer) {
+      nonWhitePlayer.turn = true;
+    }
+    
     const gameData = {
       roomId: game.id,
       words: {
@@ -112,7 +117,7 @@ function submitDescription(playerId, description) {
 
       return {
         success: true,
-        roomId: game.id,
+        game: game,
         playerId,
         playerName: player.name,
         description,
@@ -263,7 +268,7 @@ function checkForWinner(game) {
 function submitMrWhite(guessedWord, playerId) {
   const game = findGameByPlayerId(playerId);
   const player = game.players.find((player) => player.id === playerId);
-
+  game.phase = 'description'
   if (player && player.role === 'mr_white' && guessedWord.toLowerCase() === game.words.civil.toLowerCase()) {
     return { game: game ,winner: 'mr_white', name: player.name, mot : game.words.civil };
   }
@@ -271,7 +276,6 @@ function submitMrWhite(guessedWord, playerId) {
   if (check && check.winner === 'civils') {
     return { game: game, winner:'civils', name: player.name, mot : game.words.civil};
   }
-  game.phase = 'description'
   return  {game: game, name: player.name };
 }
 
@@ -316,6 +320,7 @@ function assignRoles(players) {
 
   return players.map((player, index) => {
     player.role = shuffledRoles[index];
+    player.turn = false;
     return player;
   });
 }
@@ -337,6 +342,32 @@ function shuffle(array) {
 
   return array;
 }
+
+function nextTurn(game) {
+  const currentPlayerIndex = game.players.findIndex((player) => player.turn);
+  game.players[currentPlayerIndex].turn = false;
+
+  const nonEliminatedPlayers = game.players.filter((player) => !player.eliminated);
+  const currentPlayer = nonEliminatedPlayers.findIndex((player) => player.id === game.players[currentPlayerIndex].id);
+
+  let nextPlayerIndex;
+  if (currentPlayerIndex === -1) {
+    const mrWhiteIndex = nonEliminatedPlayers.findIndex((player) => player.role === 'mr_white');
+
+    if (mrWhiteIndex === 0) {
+      nextPlayerIndex = 1;
+    } else {
+      nextPlayerIndex = 0;
+    }
+  } else {
+    nextPlayerIndex = (currentPlayer + 1) % nonEliminatedPlayers.length;
+  }
+  const nextPlayer = nonEliminatedPlayers[nextPlayerIndex];
+  nextPlayer.turn = true;
+
+  return nextPlayer;
+}
+
 module.exports = {
   createGame,
   joinGame,
@@ -346,4 +377,5 @@ module.exports = {
   findGameByPlayerId,
   submitVote,
   submitMrWhite,
+  nextTurn,
 };

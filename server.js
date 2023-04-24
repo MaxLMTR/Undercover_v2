@@ -12,6 +12,7 @@ const {
   findGameByPlayerId,
   submitVote,
   submitMrWhite,
+  nextTurn,
 } = require('./fonctions_server');
 
 const app = express();
@@ -21,6 +22,7 @@ const io = socketIO(server);
 app.use(express.static(path.join(__dirname, '/')));
 
 app.get('/', (req, res) => { res.sendFile('index.html'); });
+
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -83,6 +85,12 @@ io.on('connection', (socket) => {
   //commencer le jeu
   socket.on('startGame', async () => {
     const gameData = await startGame(socket.id);
+    const game = findGameByPlayerId(socket.id);
+    const nextPlayer = nextTurn(game);
+      io.to(game.id).emit('nextPlayer', {
+        nextPlayerId: nextPlayer.id,
+        nextPlayerName: nextPlayer.name,
+      });
     if (gameData) {
       io.to(gameData.roomId).emit('gameStarted', gameData);
     }
@@ -90,12 +98,18 @@ io.on('connection', (socket) => {
 
   //envoyer son mot
   socket.on('submitDescription', (description) => {
+    const game = findGameByPlayerId(socket.id);
     const updateData = submitDescription(socket.id, description);
     if (updateData) {
-      io.to(updateData.roomId).emit('updateDescriptions', updateData);
+      io.to(updateData.game.id).emit('updateDescriptions', updateData);
+      const nextPlayer = nextTurn(game);
+      io.to(game.id).emit('nextPlayer', {
+        nextPlayerId: nextPlayer.id,
+        nextPlayerName: nextPlayer.name,
+      });
     }
-    if (updateData.phase == 'vote') {
-      io.to(updateData.roomId).emit('startVotePhase', findGameByPlayerId(updateData.playerId));
+    if (updateData && updateData.phase == 'vote') {
+      io.to(updateData.game.id).emit('startVotePhase', updateData.game);
     }
   });
 
@@ -145,7 +159,7 @@ io.on('connection', (socket) => {
     if (updateData && updateData.winner === 'civils') {
       io.to(updateData.game.id).emit('mrWhiteNoWinnerButCivilsYes', updateData);
     }
-    else {
+    if (updateData && !updateData.winner){
       io.to(updateData.game.id).emit('mrWhiteNoWinner', updateData);
     }
   });

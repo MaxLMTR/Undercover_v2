@@ -30,6 +30,7 @@ const phase_resultats = document.getElementById('phase-resultats');
 const timer_p = document.getElementById('timer');
 const alive_players_p = document.getElementById('alive_players');
 const players_list = document.getElementById('players_list');
+const currentPlayerNameElement = document.getElementById('current-player');
 //mr_white
 const for_mr_white = document.getElementById('mr_white_container');
 const mrWhiteInput = document.getElementById('mrWhiteInput');
@@ -187,8 +188,22 @@ socket.on('undercoversWinner', (data) => {
 
 socket.on('eliminated_simple', (data) => {
   gameUpdate(data.game)
+  submitDescriptionBtn.disabled = false;
+  currentPlayerNameElement.style.display = 'inline-block';
   result_message.innerText = `${data.playerName} a été éliminé(e), c'était un ${data.votedAgainst.role}`
   timer()
+});
+
+socket.on('nextPlayer', ({ nextPlayerId, nextPlayerName }) => {
+  if(nextPlayerId == playerId){
+    submitDescriptionBtn.disabled = false;
+    currentPlayerNameElement.textContent = "C'est à votre tour!"
+  }
+  else{
+    submitDescriptionBtn.disabled = true;
+    currentPlayerNameElement.textContent = `C'est au tour de : ${nextPlayerName}`;
+  }
+  
 });
 
 function timer(){
@@ -213,15 +228,22 @@ socket.on('disable_button', () => {
 });
 
 socket.on('disable_vote', () => {
+  descriptionInput.style.display ='none'
+  descriptionInput.disabled = true;
+  submitVoteBtn.disabled.style.display ='none'
   submitVoteBtn.disabled = true;
+  submitDescriptionBtn.style.display ='none'
+  submitDescriptionBtn.disabled = true;
 });
 
 socket.on('mrWhiteWinner', (updateData) => {
-  gameUpdateEnd(updateData.game)
   result_message.innerText = `Mr White - ${updateData.name} a deviné le mot ${updateData.mot} et a gagné 🤵🎉👏!`
+  gameUpdateEnd(updateData.game)
 });
 
 socket.on('mrWhiteNoWinner', (updateData) => {
+  submitDescriptionBtn.disabled = false;
+  currentPlayerNameElement.style.display = 'inline-block';
   result_message.innerText = `Mr White - ${updateData.name} n'a pas deviné le mot, la partie continue !`
   timer()
 });
@@ -263,6 +285,8 @@ function updateDiscussionList(updateData) {
 }
 
 function startVote(data) {
+  currentPlayerNameElement.style.display = 'none';
+  submitDescriptionBtn.disabled = true;
   if(!submitVoteBtn.disabled){
     phase_vote.style.display = 'inline-block';
   }
@@ -353,6 +377,4 @@ document.getElementById('copy-room-id').addEventListener('click', () => {
   tempInput.select();
   document.execCommand('copy');
   document.body.removeChild(tempInput);
-  // Afficher un message pour indiquer que l'ID de la salle a été copié
-  alert('ID de la salle copié dans le presse-papiers');
 });
