@@ -28,11 +28,12 @@ const connectionString = process.env.MYSQL_UNDERCOVER; // Remplacez "localdb" pa
 const connectionUrl = url.parse(connectionString);
 const auth = connectionUrl.auth.split(':');
 
+
 const connection = mysql.createConnection({
   host: connectionUrl.hostname,
   user: auth[0],
   password: auth[1],
-  database: connectionUrl.pathname.substr(1),
+  database: connectionUrl.pathname.substr(1)
 });
 
 connection.connect();
