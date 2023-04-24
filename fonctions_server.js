@@ -24,7 +24,10 @@ async function getRandomWordPair() {
 
 //créer un jeu
 function createGame(playerId, playerName) {
-  const roomId = uuidv4();
+  let roomId;
+  do {
+    roomId = generateRoomId(6);
+  } while (games.has(roomId));
   const newPlayer = {
     id: playerId,
     name: playerName
@@ -35,6 +38,18 @@ function createGame(playerId, playerName) {
   };
   games.set(roomId, newGame);
   return newGame;
+}
+
+function generateRoomId(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let result = '';
+
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
 }
 
 //rejoindre un jeu

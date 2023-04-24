@@ -17,6 +17,15 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+#copy-room-id {
+  color: #7986cb;
+  cursor: pointer;
+}
+
+#copy-room-id:hover {
+  color: #666;
+}
+
 select {
   width: 100%;
   padding: 5px 10px;

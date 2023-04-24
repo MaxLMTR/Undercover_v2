@@ -344,3 +344,15 @@ function gameUpdateEnd(game){
   });
   
 }
+
+document.getElementById('copy-room-id').addEventListener('click', () => {
+  const roomId = document.getElementById('room-id').textContent;
+  const tempInput = document.createElement('input');
+  document.body.appendChild(tempInput);
+  tempInput.value = roomId;
+  tempInput.select();
+  document.execCommand('copy');
+  document.body.removeChild(tempInput);
+  // Afficher un message pour indiquer que l'ID de la salle a été copié
+  alert('ID de la salle copié dans le presse-papiers');
+});

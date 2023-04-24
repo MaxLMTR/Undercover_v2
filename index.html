@@ -7,6 +7,7 @@
   <title>Undercover / Mr. White</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl7/1G2Q1r3g6QaMqU7lPt1dQGOV8bl3fLzjT7c8Kb" crossorigin="anonymous">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
 </head>
 
@@ -21,7 +22,7 @@
       <input type="text" id="roomCode" placeholder="Code de la salle">
     </div>
     <div id="room" style="display: none;">
-      <p id="room-info">Salle : <span id="room-id"></span></p>
+      <p id="room-info">Salle : <span id="room-id"></span> <i id="copy-room-id" class="fas fa-copy"></i> </p>
       <div id="player-list">
         <h3>Joueurs :</h3>
         <ul id="players"></ul>
