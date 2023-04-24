@@ -11,6 +11,7 @@ const {
   submitDiscussion,
   findGameByPlayerId,
   submitVote,
+  submitMrWhite,
 } = require('./fonctions_server');
 
 const app = express();
@@ -59,10 +60,7 @@ io.on('connection', (socket) => {
   });
   
   //rejoindre une salle
-  socket.on('joinRoom', ({
-    playerName,
-    roomCode
-  }) => {
+  socket.on('joinRoom', ({ playerName, roomCode }) => {
     const roomInfo = joinGame(socket.id, playerName, roomCode);
     if (roomInfo) {
       socket.join(roomInfo.id);
@@ -108,40 +106,49 @@ io.on('connection', (socket) => {
   });
 
   //voter
-  socket.on('submitVote', ({
-    toEliminatePlayer,
-    playerId
-  }) => {
+  socket.on('submitVote', ({ toEliminatePlayer, playerId }) => {
     const updateData = submitVote(toEliminatePlayer, playerId);
     console.log(updateData.state);
     if (updateData) {
       io.to(playerId).emit('awaitForResults');
-      console.log(playerId);
     }
     if (updateData.state === 'eliminated_mr_white') {
+      io.to(updateData.game.id).emit('eliminatedMrWhite', updateData);
+      io.to(updateData.playerId).emit('disable_button');
       io.to(updateData.playerId).emit('Screen_for_mr_white', updateData);
-      io.to(updateData.roomId).emit('civilsWinner', updateData);
+      io.to(updateData.playerId).emit('disable_vote');
     }
     if (updateData.state === 'civils_winner') {
-      io.to(updateData.roomId).emit('civilsWinner', updateData);
-      io.to(updateData.roomId).emit('disable_button');
+      io.to(updateData.game.id).emit('civilsWinner', updateData);
+      io.to(updateData.game.id).emit('disable_button');
     }
     if (updateData.state === 'undercovers_winner') {
-      io.to(updateData.roomId).emit('undercoversWinner', updateData);
-      io.to(updateData.roomId).emit('disable_button');
+      io.to(updateData.game.id).emit('undercoversWinner', updateData);
+      io.to(updateData.game.id).emit('disable_button');
     }
     if (updateData.state === 'eliminated_simple') {
-      io.to(updateData.roomId).emit('eliminated_simple', updateData);
-      io.to(toEliminatePlayer).emit('disable_button');
+      io.to(updateData.game.id).emit('eliminated_simple', updateData);
+      io.to(updateData.playerId).emit('disable_button');
+      io.to(updateData.playerId).emit('disable_vote');
     }
     //
   });
 
-  //voter
-  socket.on("submitVote", (votedPlayerId) => {
-    // Mettez à jour la logique du serveur pour comptabiliser les votes et déterminer le résultat
+  // verifier mot mr white
+  socket.on('submitMrWhite', ({mot, playerId}) => {
+    const updateData = submitMrWhite(mot, playerId);
+    console.log(updateData);
+    if (updateData && updateData.winner === 'mr_white') {
+      console.log("MR WHITE A GAGNE");
+      io.to(updateData.game.id).emit('mrWhiteWinner', updateData);
+    }
+    if (updateData && updateData.winner === 'civils') {
+      io.to(updateData.game.id).emit('mrWhiteNoWinnerButCivilsYes', updateData);
+    }
+    else {
+      io.to(updateData.game.id).emit('mrWhiteNoWinner', updateData);
+    }
   });
-
 });
 
 const PORT = process.env.PORT || 3000;

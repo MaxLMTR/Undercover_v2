@@ -1,3 +1,4 @@
+// AJOUTER SAISIE MOT MR WHITE, SI BON ALORS GAGNE POUR LUI
 const socket = io();
 
 // Elements du DOM
@@ -22,9 +23,17 @@ const gameResults = document.getElementById('game-results');
 const resultMessage = document.getElementById('result-message');
 const discussionInput = document.getElementById('discussionin');
 const submitDiscussionBtn = document.getElementById('submitDiscussion');
-const game_vote = document.getElementById('game-vote');
-const game_vote_result = document.getElementById('game-result-vote');
 const result_message = document.getElementById('result-message');
+const phase_description = document.getElementById('phase-description');
+const phase_vote = document.getElementById('phase-vote');
+const phase_resultats = document.getElementById('phase-resultats');
+const timer_p = document.getElementById('timer');
+const alive_players_p = document.getElementById('alive_players');
+const players_list = document.getElementById('players_list');
+//mr_white
+const for_mr_white = document.getElementById('mr_white_container');
+const mrWhiteInput = document.getElementById('mrWhiteInput');
+const submitMrWhiteBtn = document.getElementById('submitMrWhite');
 
 // Variables globales
 let playerId = null;
@@ -89,8 +98,21 @@ submitVoteBtn.addEventListener('click', (e) => {
   console.log(toEliminatePlayer);
   console.log(playerId);
   socket.emit("submitVote", { toEliminatePlayer, playerId });
-  game_vote.style.display = 'none';
-  game_vote_result.style.display = 'inline-block';
+  phase_vote.style.display = 'none';
+  phase_description.style.display = 'none';
+  phase_resultats.style.display = 'inline-block';
+});
+
+//saisir mot par mr white
+submitMrWhiteBtn.addEventListener('click', () => {
+  const mot = mrWhiteInput.value;
+  if (mot) {
+    socket.emit('submitMrWhite', {mot, playerId});
+    mrWhiteInput.value = '';
+    for_mr_white.style.display = 'none';
+  } else {
+    alert('Veuillez entrer un mot.');
+  }
 });
 
 socket.on('playerInfo', (playerInfo) => {
@@ -118,10 +140,12 @@ socket.on('NotenoughToStart', () => {
 });
 
 socket.on('gameStarted', (gameData) => {
+  gameUpdate(gameData)
   currentPhase = 'description';
   lobby.style.display = 'none';
   room.style.display = 'none';
   game.style.display = 'block';
+  phase_description.style.display = 'block';
   playerWord.textContent = gameData.players.find(p => p.id === playerId).word;
 });
 
@@ -138,36 +162,74 @@ socket.on('startVotePhase', (data) => {
 });
 
 socket.on('awaitForResults', () => {
-  game_vote_result.style.display = 'inline-block';
+  phase_resultats.style.display = 'inline-block';
   result_message.innerText = 'Attente des résultats de vote';
 });
 
 socket.on('Screen_for_mr_white', (data) => {
-  //
+  for_mr_white.style.display = 'inline-block';
 });
 
-socket.on('eliminated_mr_white', (data) => {
-  game_vote_result.style.display = 'inline-block';
-  result_message.innerText = `${data.playerName} a été éliminé(e), c'était ${data.votedAgainst.role}, il va devoir deviner son mot`
+socket.on('eliminatedMrWhite', (data) => {
+  gameUpdate(data.game)
+  result_message.innerText = `${data.playerName} a été éliminé(e), c'était ${data.votedAgainst.role}🤵, il va devoir deviner son mot`
 });
 
-socket.on('civils_winner', (data) => {
-  game_vote_result.style.display = 'inline-block';
-  result_message.innerText = result_message.innerText = `${data.playerName} a été éliminé(e), c'était un ${data.votedAgainst.role}, les civils ont gagné !`
+socket.on('civilsWinner', (data) => {
+  gameUpdateEnd(data.game)
+  result_message.innerText = result_message.innerText = `${data.playerName} - ${data.votedAgainst.role} a été éliminé(e), c'était un ${data.votedAgainst.role}, les civils ont gagné 😇🎉👏!`
 });
 
 socket.on('undercoversWinner', (data) => {
-  result_message.innerText = `${data.playerName} a été éliminé(e), c'était un ${data.votedAgainst.role}, les imposteurs ont gagné !`
+  gameUpdateEnd(data.game)
+  result_message.innerText = `${data.playerName} a été éliminé(e), c'était un ${data.votedAgainst.role}, les imposteurs ont gagné 🤵🕵️🎉👏!`
 });
 
 socket.on('eliminated_simple', (data) => {
+  gameUpdate(data.game)
   result_message.innerText = `${data.playerName} a été éliminé(e), c'était un ${data.votedAgainst.role}`
+  timer()
 });
+
+function timer(){
+  timer_p.style.display = 'inline-block';
+  let timeRemaining = 30;
+  const countdown = setInterval(() => {
+    timeRemaining--;
+    timer_p.innerText = `Prochain tour dans : ${timeRemaining}`;
+    if (timeRemaining <= 0) {
+      clearInterval(countdown);
+      timer_p.style.display = 'none';
+      if(!submitVoteBtn.disabled){
+        phase_resultats.style.display = 'none';
+      }
+      phase_description.style.display = 'inline-block';
+    }
+  }, 1000);
+}
 
 socket.on('disable_button', () => {
   submitDescriptionBtn.disabled = true;
 });
 
+socket.on('disable_vote', () => {
+  submitVoteBtn.disabled = true;
+});
+
+socket.on('mrWhiteWinner', (updateData) => {
+  gameUpdateEnd(updateData.game)
+  result_message.innerText = `Mr White - ${updateData.name} a deviné le mot ${updateData.mot} et a gagné 🤵🎉👏!`
+});
+
+socket.on('mrWhiteNoWinner', (updateData) => {
+  result_message.innerText = `Mr White - ${updateData.name} n'a pas deviné le mot, la partie continue !`
+  timer()
+});
+
+socket.on('mrWhiteNoWinnerButCivilsYes', (updateData) => {
+  gameUpdateEnd(updateData.game)
+  result_message.innerText = `Mr White - ${updateData.name} n'a pas deviné le mot et a été éliminé, les civils ont gagné 😇🎉👏!`
+});
 
 function showRoom(roomInfo) {
   lobby.style.display = 'none';
@@ -201,15 +263,84 @@ function updateDiscussionList(updateData) {
 }
 
 function startVote(data) {
-  game_vote.style.display = 'inline-block';
-  console.log("#########################################");
-  console.log(data);
+  if(!submitVoteBtn.disabled){
+    phase_vote.style.display = 'inline-block';
+  }
+  else{
+    result_message.innerText = 'Attente des résultats de vote';
+    phase_description.style.display = 'none';
+  }
   eliminationList.innerHTML = '';
   const players_not_eliminated = data.players.filter((player) => !player.eliminated);
-  players_not_eliminated.forEach((player) => {
+  const players_filtred = players_not_eliminated.filter((player) => player.id != playerId );
+  players_filtred.forEach((player) => {
     const option = document.createElement("option");
     option.value = player.id;
     option.textContent = `${player.name}`;
     eliminationList.appendChild(option);
   });
+}
+
+function gameUpdate(game){
+  let civilsAlive = 0;
+  let undercoversAlive = 0;
+  let mrWhiteAlive = 0;
+
+  game.players.forEach((player) => {
+    if (player && !player.eliminated) {
+      if (player.role === 'civil') {
+        civilsAlive++;
+      } else if (player.role === 'undercover') {
+        undercoversAlive++;
+      } else if (player.role === 'mr_white') {
+      mrWhiteAlive++;
+      }
+    }
+  });
+  alive_players_p.innerText = `${civilsAlive} civils vivants\n${undercoversAlive} undercovers vivants\n${mrWhiteAlive} Mr Whites vivants`
+  players_list.innerHTML = '';
+  game.players.forEach((player) => {
+    const li = document.createElement('li');
+    li.setAttribute('player-id', player.id);
+    if(player && player.eliminated){
+      li.innerHTML = `${player.name} - ${player.role} 💀`;
+    }
+    else{
+      li.textContent = player.name;
+    }
+    players_list.appendChild(li);
+  });
+  
+}
+
+function gameUpdateEnd(game){
+  let civilsAlive = 0;
+  let undercoversAlive = 0;
+  let mrWhiteAlive = 0;
+
+  game.players.forEach((player) => {
+    if (player && !player.eliminated) {
+      if (player.role === 'civil') {
+        civilsAlive++;
+      } else if (player.role === 'undercover') {
+        undercoversAlive++;
+      } else if (player.role === 'mr_white') {
+      mrWhiteAlive++;
+      }
+    }
+  });
+  alive_players_p.innerText = `${civilsAlive} civils vivants\n${undercoversAlive} undercovers vivants\n${mrWhiteAlive} Mr Whites vivants`
+  players_list.innerHTML = '';
+  game.players.forEach((player) => {
+    const li = document.createElement('li');
+    li.setAttribute('player-id', player.id);
+    if(player && player.eliminated){
+      li.innerHTML = `${player.name} - ${player.role} 💀`;
+    }
+    else{
+      li.innerHTML = `${player.name} - ${player.role}`;
+    }
+    players_list.appendChild(li);
+  });
+  
 }

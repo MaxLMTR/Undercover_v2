@@ -35,10 +35,28 @@
       </div>
       <div id="game-phase-container">
         <div id="game-phase">
-          <h3>Phase de Description</h3>
-          <input type="text" id="description" placeholder="Décrivez votre mot">
-          <button id="submitDescription">Soumettre</button>
-          <ul id="descriptions"></ul>
+          <div id="phase-description" style="display: none;">
+            <h3>Phase de Description</h3>
+            <input type="text" id="description" placeholder="Décrivez votre mot">
+            <button id="submitDescription">Soumettre</button>
+            <ul id="descriptions"></ul>
+          </div>
+          <div id="phase-vote" style="display: none;">
+            <h3>Vote</h3>
+            <select id="votelist">
+            </select>
+            <button id="submitVote">Voter</button>
+          </div>
+          <div id="phase-resultats" style="display: none;">
+            <h3>Résultats des votes</h3>
+            <p id="result-message"></p>
+            <p id="timer" style="display: none;">Prochain tour dans : 30</p>
+            <div id="mr_white_container" style="display: none;">
+              <h3>Entrez votre mot</h3>
+              <input type="text" id="mrWhiteInput" placeholder="Saisissez votre mot">
+              <button id="submitMrWhite">Soumettre</button>
+            </div>
+          </div>
         </div>
         <div id="game-phase">
           <h3>Chat</h3>
@@ -46,17 +64,13 @@
           <input type="text" id="discussionin" placeholder="Discutez">
           <button id="submitDiscussion">Envoyer</button>
         </div>
-      </div>
-      <div id="game-phase-container"></div>
-      <div id="game-vote" style="display: none;">
-        <h3>Vote</h3>
-        <select id="votelist">
-        </select>
-        <button id="submitVote">Voter</button>
-      </div>
-      <div id="game-result-vote" style="display: none;">
-        <h3>Résultats des votes:</h3>
-        <p id="result-message"></p>
+        <div id="game-joueur">
+          <h3>Joueurs</h3>
+          <p id=alive_players class=rules></p>
+          <ul id="players_list"></ul>
+          <h3>Regles du jeu</h3>
+          <p class=rules>blablablalbalbalbe</p>
+        </div>
       </div>
     </div>
   </div>

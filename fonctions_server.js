@@ -57,7 +57,7 @@ async function startGame(playerId) {
   if (game) {
     const wordPair = await getRandomWordPair();
     game.players = assignRoles(game.players);
-    game.words = wordPair;
+    game.words = { civil: wordPair.word1, undercover: wordPair.word2, }
     game.phase = 'description';
 
     const gameData = {
@@ -157,22 +157,20 @@ function submitVote(toEliminatePlayer, PlayerWhoVoted) {
           eliminatedPlayer = player;
         }
         });
-
+        game.players.forEach((player) => {
+                  player.description = '';
+                  player.votes = 0;
+                  player.voted = false;
+                });
         if (eliminatedPlayer) {
           eliminatedPlayer.eliminated = true;
         }
         
-        game.players.forEach((player) => {
-          player.description = '';
-          player.votes = 0;
-          player.voted = false;
-        });
-
         if (eliminatedPlayer.role === 'mr_white') {
           return {
             state:'eliminated_mr_white',
             success: true,
-            roomId: game.id,
+            game: game,
             playerId : eliminatedPlayer.id,
             playerName: eliminatedPlayer.name,
             votedAgainst: eliminatedPlayer,
@@ -184,7 +182,7 @@ function submitVote(toEliminatePlayer, PlayerWhoVoted) {
           return {
             state:'civils_winner',
             success: true,
-            roomId: game.id,
+            game: game,
             playerId : eliminatedPlayer.id,
             playerName: eliminatedPlayer.name,
             votedAgainst: eliminatedPlayer,
@@ -196,7 +194,7 @@ function submitVote(toEliminatePlayer, PlayerWhoVoted) {
           return {
             state:'undercovers_winner',
             success: true,
-            roomId: game.id,
+            game: game,
             playerId : eliminatedPlayer.id,
             playerName: eliminatedPlayer.name,
             votedAgainst: eliminatedPlayer,
@@ -208,7 +206,7 @@ function submitVote(toEliminatePlayer, PlayerWhoVoted) {
         return {
           state:'eliminated_simple',
           success: true,
-          roomId: game.id,
+          game: game,
           playerId : eliminatedPlayer.id,
           playerName: eliminatedPlayer.name,
           votedAgainst: eliminatedPlayer,
@@ -235,27 +233,31 @@ function checkForWinner(game) {
 
   // Les civils gagnent s'ils éliminent tous les undercovers et les Mr.Whites.
   if (aliveUndercovers.length === 0 && aliveMrWhites.length === 0) {
-    return { winner: 'civils', players: aliveCivils };
+    return { winner: 'civils', players: aliveCivils, game : game };
   }
 
   // Les imposteurs (Undercovers et/ou Mr.Whites) gagnent s'ils survivent jusqu'à ce qu'il ne reste plus qu'1 Civil.
   if (aliveCivils.length === 1 && (aliveUndercovers.length > 0 || aliveMrWhites.length > 0)) {
     const impostors = aliveUndercovers.concat(aliveMrWhites);
-    return { winner: 'undercovers', players: impostors };
+    return { winner: 'undercovers', players: impostors, game : game };
   }
   return null;
 }
 
 // Ajoutez une fonction pour permettre à Mr.White de deviner le mot secret des civils
-function guessSecretWord(playerId, guessedWord) {
+function submitMrWhite(guessedWord, playerId) {
   const game = findGameByPlayerId(playerId);
   const player = game.players.find((player) => player.id === playerId);
 
-  if (player && player.role === 'mr_white' && guessedWord.toLowerCase() === game.secretWord.toLowerCase()) {
-    return { winner: 'mr_white', player };
+  if (player && player.role === 'mr_white' && guessedWord.toLowerCase() === game.words.civil.toLowerCase()) {
+    return { game: game ,winner: 'mr_white', name: player.name, mot : game.words.civil };
   }
-
-  return null;
+  const check = checkForWinner(game);
+  if (check && check.winner === 'civils') {
+    return { game: game, winner:'civils', name: player.name, mot : game.words.civil};
+  }
+  game.phase = 'description'
+  return  {game: game, name: player.name };
 }
 
 
@@ -328,4 +330,5 @@ module.exports = {
   submitDiscussion,
   findGameByPlayerId,
   submitVote,
+  submitMrWhite,
 };

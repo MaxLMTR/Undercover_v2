@@ -34,13 +34,12 @@ select {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 2rem;
 }
 
-#game-phase,#game-vote,#game-result-vote {
+#game-phase,#game-joueur,#game-vote,#game-result-vote {
   flex: 1;
-  min-width: 300px;
-  max-width: 45%;
+  min-width: 250px;
+  max-width: 100%;
   padding: 1rem;
   box-sizing:content-box;
   border: 1px solid #ccc;
@@ -51,10 +50,17 @@ p {
   font-size: 1.5rem;
 }
 
+.rules{
+  font-size: 1rem;
+  font-weight: bold;
+}
+
 h1 {
   text-align: center;
-  font-size: 3rem;
+  font-size: 2.5rem;
+  font-weight: 700;
   margin-bottom: 5px;
+  margin-top: 0px;
   color: #ab47bc;
 }
 label {
@@ -107,6 +113,11 @@ button:disabled {
   padding: 0;
 }
 
+#game-joueur ul {
+  list-style-type: none;
+  padding: 0;
+}
+
 #player-list li {
   padding: 5px 10px;
   background-color: #484a5d;
@@ -114,7 +125,14 @@ button:disabled {
   margin-bottom: 5px;
 }
 
-#game-phase {
+#game-joueur li {
+  padding: 5px 10px;
+  background-color: #484a5d;
+  border-radius: 3px;
+  margin-bottom: 5px;
+}
+
+#game-phase,#game-joueur{
   margin-bottom: 20px;
 }
 
@@ -141,10 +159,6 @@ button:disabled {
   text-align: center;
 }
 
-#result-message {
-  font-size: 2rem;
-  color: #ab47bc;
-}
 
 /* Ajout de styles supplémentaires pour améliorer l'expérience utilisateur */
 #lobby,
