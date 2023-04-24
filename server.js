@@ -25,9 +25,9 @@ app.get('/', (req, res) => { res.sendFile('index.html'); });
 
 
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
+  host: 'undercover.mysql.database.azure.com:3306',
+  user: 'undercover',
+  password: 'BestGame.123',
   database: 'undercover'
 });
 
