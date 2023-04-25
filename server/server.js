@@ -3,7 +3,7 @@ const http = require("http");
 const socketIO = require("socket.io");
 const path = require("path");
 const mysql = require("mysql");
-const { createGame, joinGame, startGame, submitDescription, submitDiscussion, findGameByPlayerId, submitVote, submitMrWhite, nextTurn, } = require("./fonctions_server");
+const { createGame, joinGame, startGame, submitDescription, submitDiscussion,findGameByPlayerId, submitVote, submitMrWhite, nextTurn, } = require("./fonctions_server");
 
 const app = express();
 const server = http.createServer(app);

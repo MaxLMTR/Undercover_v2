@@ -277,7 +277,7 @@ function checkForWinner(game) {
   return null;
 }
 
-// Ajoutez une fonction pour permettre à Mr.White de deviner le mot secret des civils
+// fonction pour permettre à Mr.White de deviner le mot secret des civils
 function submitMrWhite(guessedWord, playerId) {
   const game = findGameByPlayerId(playerId);
   const player = game.players.find((player) => player.id === playerId);
@@ -288,19 +288,15 @@ function submitMrWhite(guessedWord, playerId) {
     guessedWord.toLowerCase() === game.words.civil.toLowerCase()
   ) {
     return {
-      game: game,
-      winner: "mr_white",
-      name: player.name,
-      mot: game.words.civil,
+      game: game, winner: "mr_white",
+      name: player.name, mot: game.words.civil,
     };
   }
   const check = checkForWinner(game);
   if (check && check.winner === "civils") {
     return {
-      game: game,
-      winner: "civils",
-      name: player.name,
-      mot: game.words.civil,
+      game: game, winner: "civils",
+      name: player.name, mot: game.words.civil,
     };
   }
   return { game: game, name: player.name };
