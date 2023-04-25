@@ -66,9 +66,9 @@ async function startGame(playerId) {
     game.words = { civil: wordPair.word1, undercover: wordPair.word2 };
     game.phase = "description";
 
-    const nonWhitePlayer = game.players.find(
-      (player) => player.role !== "mr_white",
-    );
+    const nonWhitePlayers = game.players.filter( (player) => player.role !== "mr_white" );
+    const randomIndex = Math.floor(Math.random() * nonWhitePlayers.length);
+    const nonWhitePlayer = nonWhitePlayers[randomIndex];
     if (nonWhitePlayer) {
       nonWhitePlayer.turn = true;
     }
@@ -79,6 +79,7 @@ async function startGame(playerId) {
         civil: wordPair.word1,
         undercover: wordPair.word2,
       },
+      nextPlayer: nonWhitePlayer,
       players: game.players.map((player) => ({
         id: player.id,
         name: player.name,
@@ -360,6 +361,8 @@ function shuffle(array) {
 function nextTurn(game) {
   const currentPlayerIndex = game.players.findIndex((player) => player.turn);
   game.players[currentPlayerIndex].turn = false;
+  console.log(currentPlayerIndex);
+  console.log(game.players);
 
   const nonEliminatedPlayers = game.players.filter(
     (player) => !player.eliminated,
@@ -385,6 +388,8 @@ function nextTurn(game) {
   const nextPlayer = nonEliminatedPlayers[nextPlayerIndex];
   nextPlayer.turn = true;
 
+  console.log(nextPlayer);
+  console.log(nextPlayerIndex);
   return nextPlayer;
 }
 

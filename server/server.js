@@ -76,11 +76,9 @@ io.on("connection", (socket) => {
   //commencer le jeu
   socket.on("startGame", async () => {
     const gameData = await startGame(socket.id);
-    const game = findGameByPlayerId(socket.id);
-    const nextPlayer = nextTurn(game);
-    io.to(game.id).emit("nextPlayer", {
-      nextPlayerId: nextPlayer.id,
-      nextPlayerName: nextPlayer.name,
+    io.to(gameData.roomId).emit("nextPlayer", {
+      nextPlayerId: gameData.nextPlayer.id,
+      nextPlayerName: gameData.nextPlayer.name,
     });
     if (gameData) {
       io.to(gameData.roomId).emit("gameStarted", gameData);
