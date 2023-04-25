@@ -361,9 +361,6 @@ function shuffle(array) {
 function nextTurn(game) {
   const currentPlayerIndex = game.players.findIndex((player) => player.turn);
   game.players[currentPlayerIndex].turn = false;
-  console.log(currentPlayerIndex);
-  console.log(game.players);
-
   const nonEliminatedPlayers = game.players.filter(
     (player) => !player.eliminated,
   );
@@ -387,9 +384,6 @@ function nextTurn(game) {
   }
   const nextPlayer = nonEliminatedPlayers[nextPlayerIndex];
   nextPlayer.turn = true;
-
-  console.log(nextPlayer);
-  console.log(nextPlayerIndex);
   return nextPlayer;
 }
 
